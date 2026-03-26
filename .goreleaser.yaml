@@ -1,0 +1,70 @@
+project_name: upgrade-guard
+version: 2
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - env:
+      - CGO_ENABLED=0
+    mod_timestamp: '{{ .CommitTimestamp }}'
+    flags:
+      - -trimpath
+    ldflags:
+      - '-s -w -X main.version={{.Version}} -X main.commit={{.Commit}}'
+    goos:
+      - linux
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+
+snapshot:
+  version_template: '{{ incpatch .Version }}'
+
+archives:
+  - formats:
+      - tar.gz
+    name_template: '{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}'
+
+checksum:
+  name_template: "{{ .ProjectName }}_{{ .Version }}_SHA256SUMS"
+  algorithm: sha256
+
+signs:
+  - artifacts: checksum
+    args:
+      - "--batch"
+      - "--local-user"
+      - "{{ .Env.GPG_FINGERPRINT }}"
+      - "--output"
+      - "${signature}"
+      - "--detach-sign"
+      - "${artifact}"
+
+release:
+  draft: false
+
+changelog:
+  use: git
+  filters:
+    include:
+      - "^feat:"
+      - "^fix:"
+      - "^chore:"
+      - "^docs:"
+  sort: asc
+  groups:
+    - title: '🛠 Dependency updates'
+      regexp: '^fix\(deps\):|^feat\(deps\):'
+      order: 300
+    - title: '✨ New Features'
+      regexp: '^feat(\([^)]*\))?:'
+      order: 100
+    - title: '🐛 Bug fixes'
+      regexp: '^fix(\([^)]*\))?:'
+      order: 200
+    - title: '📖 Documentation updates'
+      regexp: '^docs(\([^)]*\))?:'
+      order: 400

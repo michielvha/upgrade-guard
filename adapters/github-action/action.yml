@@ -1,0 +1,40 @@
+name: Upgrade Guard
+description: Risk assessment for infrastructure dependency upgrades
+author: VH & Co
+
+branding:
+  icon: shield
+  color: blue
+
+inputs:
+  anthropic_api_key:
+    description: Anthropic API key for Claude
+    required: true
+  github_token:
+    description: GitHub token for posting PR comments
+    required: false
+    default: ${{ github.token }}
+  config_path:
+    description: Path to upgrade-guard.yaml config file
+    required: false
+    default: upgrade-guard.yaml
+  output:
+    description: "Output format: stdout, json, github-pr-comment"
+    required: false
+    default: github-pr-comment
+  guard_level:
+    description: "Guard level override: basic, standard, full"
+    required: false
+
+runs:
+  using: docker
+  image: docker://ghcr.io/vhco/upgrade-guard:latest
+  env:
+    ANTHROPIC_API_KEY: ${{ inputs.anthropic_api_key }}
+    GITHUB_TOKEN: ${{ inputs.github_token }}
+    UPGRADE_GUARD_REPO: ${{ github.repository }}
+    UPGRADE_GUARD_PR_NUMBER: ${{ github.event.pull_request.number }}
+    UPGRADE_GUARD_OUTPUT: ${{ inputs.output }}
+    UPGRADE_GUARD_CONFIG: ${{ inputs.config_path }}
+  args:
+    - analyze

@@ -1,0 +1,27 @@
+# Azure DevOps Pipeline template for Upgrade Guard
+# Add this as a step in your PR validation pipeline.
+#
+# Required pipeline variables:
+#   ANTHROPIC_API_KEY  — Anthropic API key (set as secret variable)
+#
+# The template uses built-in ADO variables for org, project, repo, and PR context.
+
+steps:
+  - checkout: self
+
+  - script: |
+      docker run --rm \
+        -v $(Build.SourcesDirectory):/workspace \
+        -e ANTHROPIC_API_KEY="$(ANTHROPIC_API_KEY)" \
+        -e UPGRADE_GUARD_ADO_ORG="$(System.CollectionUri)" \
+        -e UPGRADE_GUARD_ADO_PROJECT="$(System.TeamProject)" \
+        -e UPGRADE_GUARD_ADO_REPO="$(Build.Repository.Name)" \
+        -e UPGRADE_GUARD_ADO_PR="$(System.PullRequest.PullRequestId)" \
+        -e UPGRADE_GUARD_ADO_TOKEN="$(System.AccessToken)" \
+        -e UPGRADE_GUARD_OUTPUT=azure-pr-comment \
+        ghcr.io/vhco/upgrade-guard:latest \
+        analyze --repo-root /workspace
+    displayName: Run Upgrade Guard
+    condition: eq(variables['Build.Reason'], 'PullRequest')
+    env:
+      SYSTEM_ACCESSTOKEN: $(System.AccessToken)

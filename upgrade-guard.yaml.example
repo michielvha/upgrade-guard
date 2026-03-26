@@ -1,0 +1,56 @@
+# upgrade-guard.yaml — Configuration for Upgrade Guard
+#
+# Place this file at the root of your repository.
+# All fields are optional. Without this file, Upgrade Guard runs at "basic" level.
+
+# Guard level controls analysis depth.
+#   basic    — PR diff only, general compatibility info (zero config)
+#   standard — PR diff + platform state from repo files and this config
+#   full     — Everything above + live cluster state (requires kubeconfig)
+level: standard
+
+# Platform details — override or supplement what Upgrade Guard infers from repo files.
+platform:
+  kubernetes_version: "1.29"
+  provider: eks                # eks | aks | gke | k3s | kind | other
+
+# Pin component versions that Upgrade Guard can't infer from repo files.
+components:
+  cluster-autoscaler: "1.29.0"
+  cert-manager: "1.14.5"
+  argocd: "2.10.6"
+  external-secrets: "0.9.13"
+
+# Free-text context for the LLM. Describe your setup so the analysis
+# can factor in specifics that aren't in your manifests.
+context: |
+  We use Cilium as CNI (not kube-proxy).
+  ArgoCD manages all workloads via app-of-apps pattern.
+  External Secrets Operator syncs from AWS Secrets Manager.
+
+# Only needed for 'full' level — live cluster queries.
+# cluster:
+#   kubeconfig_path: ""        # uses default (~/.kube/config) if empty
+#   context: "my-cluster"      # specific kubeconfig context to use
+
+settings:
+  # LLM model selection.
+  #   auto             — picks model based on guard level (recommended)
+  #   claude-sonnet-4-6 — force Sonnet for all levels
+  #   claude-opus-4-6   — force Opus for all levels
+  llm_model: auto
+
+  # Output format (can be overridden via CLI flag or env var).
+  #   stdout           — plain text to terminal
+  #   json             — structured JSON
+  #   pr-comment       — post as PR comment (requires CI adapter)
+  output_format: stdout
+
+  # Components to skip analysis on.
+  ignore_components: []
+
+  # Minimum risk level to report.
+  #   low    — report everything
+  #   medium — skip low-risk items
+  #   high   — only report high-risk items
+  risk_threshold: low
