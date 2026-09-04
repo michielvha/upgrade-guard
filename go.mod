@@ -4,7 +4,7 @@ go 1.26.0
 
 require (
 	github.com/anthropics/anthropic-sdk-go v1.27.1
-	github.com/charmbracelet/log v1.0.0
+	github.com/charmbracelet/log/v2 v2.0.1
 	github.com/google/go-github/v68 v68.0.0
 	github.com/spf13/cobra v1.10.2
 	gopkg.in/yaml.v3 v3.0.1
