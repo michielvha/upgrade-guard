@@ -21,18 +21,18 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           fetch-depth: 0
           persist-credentials: true
 
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5.6.0
         with:
           go-version: '1.26'
 
       - name: Lint
-        uses: golangci/golangci-lint-action@v6
+        uses: golangci/golangci-lint-action@55c2c1448f86e01eaae002a5a3a9624417608d84 # v6.5.2
         with:
           version: latest
 
@@ -41,18 +41,18 @@ jobs:
 
       - name: Tag with GitVersion
         id: gitversion
-        uses: michielvha/gitversion-tag-action@main
+        uses: michielvha/gitversion-tag-action@8cf5869816cf71437052ac97d086e00526bf2d89 # v7.0.4
         with:
           configFilePath: gitversion.yml
 
       - name: Build and Release Go Binary
-        uses: michielvha/goreleaser-action@main
+        uses: michielvha/goreleaser-action@a86fcdf453812a9d69b85208c0cb6a1e73f136b8 # v1
         with:
           github-token: ${{ github.token }}
           pgp-private-key: ${{ secrets.PGP_PRIVATE_KEY }}
 
       - name: Build and Push Docker Image
-        uses: michielvha/docker-release-action@main
+        uses: michielvha/docker-release-action@c499e52a1a05e5bdd8cf03ba19a423d4c7ec25e3 # v2
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
