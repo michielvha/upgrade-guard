@@ -46,7 +46,7 @@ jobs:
           configFilePath: gitversion.yml
 
       - name: Build and Release Go Binary
-        uses: michielvha/goreleaser-action@a86fcdf453812a9d69b85208c0cb6a1e73f136b8 # v1
+        uses: michielvha/goreleaser-action@99d53be595f6e73dbbd9adb136ea4c1cca86fe58 # v2.0.0
         with:
           github-token: ${{ github.token }}
           pgp-private-key: ${{ secrets.PGP_PRIVATE_KEY }}
